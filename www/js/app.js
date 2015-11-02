@@ -5,9 +5,32 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
+angular.module('starter', ['ionic', 'openfb', 'RapidSettings', 'LoginModule'])
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, OpenFB, appSettings, $rootScope, $state) {
+
+    appSettings.initFb();
+
+    $rootScope.$on("$stateChangeStart", function (event, toState) {
+      if ((toState.name != 'login' && toState.name != 'logout')
+        && window.sessionStorage.fbtoken === 'undefined') {
+        event.preventDefault();
+        $state.go("login");
+      }
+
+      if (!$rootScope.user) {
+        OpenFB.get('/me', {fields: appSettings.userFields})
+          .success(function (user) {
+            $rootScope.user = user;
+            console.log(user);
+          })
+          .error(function () {
+            $state.go("login");
+          })
+        ;
+      }
+    });
+
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -38,48 +61,50 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
     templateUrl: 'templates/tabs.html'
   })
 
+    ;
+
   // Each tab has its own nav history stack:
 
-  .state('tab.dash', {
-    url: '/dash',
-    views: {
-      'tab-dash': {
-        templateUrl: 'templates/tab-dash.html',
-        controller: 'DashCtrl'
-      }
-    }
-  })
+  //.state('tab.dash', {
+  //  url: '/dash',
+  //  views: {
+  //    'tab-dash': {
+  //      templateUrl: 'templates/tab-dash.html',
+  //      controller: 'DashCtrl'
+  //    }
+  //  }
+  //})
 
-  .state('tab.chats', {
-      url: '/chats',
-      views: {
-        'tab-chats': {
-          templateUrl: 'templates/tab-chats.html',
-          controller: 'ChatsCtrl'
-        }
-      }
-    })
-    .state('tab.chat-detail', {
-      url: '/chats/:chatId',
-      views: {
-        'tab-chats': {
-          templateUrl: 'templates/chat-detail.html',
-          controller: 'ChatDetailCtrl'
-        }
-      }
-    })
-
-  .state('tab.account', {
-    url: '/account',
-    views: {
-      'tab-account': {
-        templateUrl: 'templates/tab-account.html',
-        controller: 'AccountCtrl'
-      }
-    }
-  });
+  //.state('tab.chats', {
+  //    url: '/chats',
+  //    views: {
+  //      'tab-chats': {
+  //        templateUrl: 'templates/tab-chats.html',
+  //        controller: 'ChatsCtrl'
+  //      }
+  //    }
+  //  })
+  //  .state('tab.chat-detail', {
+  //    url: '/chats/:chatId',
+  //    views: {
+  //      'tab-chats': {
+  //        templateUrl: 'templates/chat-detail.html',
+  //        controller: 'ChatDetailCtrl'
+  //      }
+  //    }
+  //  })
+  //
+  //.state('tab.account', {
+  //  url: '/account',
+  //  views: {
+  //    'tab-account': {
+  //      templateUrl: 'templates/tab-account.html',
+  //      controller: 'AccountCtrl'
+  //    }
+  //  }
+  //});
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/tab/dash');
+  $urlRouterProvider.otherwise('/login');
 
 });
