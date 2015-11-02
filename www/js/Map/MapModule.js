@@ -1,6 +1,6 @@
-angular.module("MapModule").
+angular.module("MapModule")
 	.config(function($stateProvider, $urlRouterProvider) {
-	 $stateProvider
+	 // $stateProvider
 
-		 
+
 });
