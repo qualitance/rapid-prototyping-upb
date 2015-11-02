@@ -1,8 +1,8 @@
-angular.module("ProfileModule").
+angular.module("ProfileModule")
 	.config(function($stateProvider, $urlRouterProvider) {
 	 $stateProvider
 
-	 .state('tab.tab-profile', {
+	 .state('tab.profile', {
 	      url: '/profile',
 	      views: {
 	        'tab-profile': {
